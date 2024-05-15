@@ -67,8 +67,8 @@ This script demonstrates object tracking by selecting a Region of Interest (ROI)
 ## How to Run
 
 1. **Clone the Repository**:
-   git clone https://github.com/yourusername/optical-flow-tracking.git
-   cd optical-flow-tracking
+   git clone https://github.com/omomdhai/Optical-Flow.git
+   cd Optical-Flow
 
 2. **Run the Desired Script**:
    - For dense optical flow:
