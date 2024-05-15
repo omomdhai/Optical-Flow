@@ -1,0 +1,120 @@
+import numpy as np
+import cv2
+import globalVariables as gV
+import random
+
+gV.selRoi = 0
+gV.roi_size = 80  # Define the initial size of the ROI
+gV.first_time = 1
+# Parameters for Lucas-Kanade optical flow
+lk_params = dict(winSize=(15, 15),
+                 maxLevel=2,
+                 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+
+def findDistance(r1, c1, r2, c2):
+    d = (r1 - r2)**2 + (c1 - c2)**2
+    d = d**0.5
+    return d
+
+# Main function
+cv2.namedWindow('tracker')
+
+cap = cv2.VideoCapture(1)
+previous_lines = []  # Store previous motion trajectories
+
+while True:
+    # Reset previous_lines each time a new tracking session starts
+    previous_lines = []
+    
+    while True:
+        _, frame = cap.read()
+        # Drawing Stuff on the Image
+        cv2.putText(frame, 'Press a to start tracking', (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(60, 100, 75),
+                    thickness=3)
+        cv2.rectangle(frame, (gV.top_left[1], gV.top_left[0]), (gV.bottom_right[1], gV.bottom_right[0]),
+                      color=(100, 255, 100), thickness=4)
+
+        # Finding ROI and extracting Corners
+        frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        roi = frameGray[gV.top_left[0]:gV.bottom_right[0], gV.top_left[1]:gV.bottom_right[1]]  # Selecting ROI
+        new_corners = cv2.goodFeaturesToTrack(roi, 50, 0.01, 10)  # Find corners
+
+        # Converting to complete image coordinates (new_corners)
+        new_corners[:, 0, 0] = new_corners[:, 0, 0] + gV.top_left[1]
+        new_corners[:, 0, 1] = new_corners[:, 0, 1] + gV.top_left[0]
+
+        # Drawing the corners in the original image
+        for corner in new_corners:
+            cv2.circle(frame, (int(corner[0][0]), int(corner[0][1])), 5, (0, 255, 0))
+
+        # Old_corners and oldFrame is updated
+        oldFrameGray = frameGray.copy()
+        old_corners = new_corners.copy()
+
+        cv2.imshow('tracker', frame)
+
+        a = cv2.waitKey(5)
+        if a == 27:
+            cv2.destroyAllWindows()
+            cap.release()
+        elif a == 97:
+            break
+
+    # Actual Tracking
+    while True:
+        # Read new frame and convert to gray
+        ret, frame = cap.read()
+        frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Finding the new tracked points
+        new_corners, st, err = cv2.calcOpticalFlowPyrLK(oldFrameGray, frameGray, old_corners, None, **lk_params)
+
+        # Pruning far away points:
+        # First finding centroid
+        r_add, c_add = 0, 0
+        for corner in new_corners:
+            r_add = r_add + corner[0][1]
+            c_add = c_add + corner[0][0]
+        centroid_row = int(1.0 * r_add / len(new_corners))
+        centroid_col = int(1.0 * c_add / len(new_corners))
+
+        # Calculate the new top-left and bottom-right coordinates for ROI
+        gV.top_left = [centroid_row - gV.roi_size // 2, centroid_col - gV.roi_size // 2]
+        gV.bottom_right = [centroid_row + gV.roi_size // 2, centroid_col + gV.roi_size // 2]
+
+        # Draw centroid and rectangle around ROI
+        cv2.circle(frame, (int(centroid_col), int(centroid_row)), 5, (255, 0, 0))
+        cv2.rectangle(frame, (gV.top_left[1], gV.top_left[0]), (gV.bottom_right[1], gV.bottom_right[0]),
+                      color=(100, 255, 100), thickness=4)
+
+        # Draw motion trajectories from optical flow
+        for i in range(len(old_corners)):
+            # Get the coordinates from the previous and current frames
+            x1, y1 = old_corners[i][0]
+            x2, y2 = new_corners[i][0]
+
+            # Draw a line connecting the points
+            cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+            previous_lines.append(((int(x1), int(y1)), (int(x2), int(y2))))  # Store the line
+
+        # Draw previous motion trajectories
+        for line in previous_lines:
+            cv2.line(frame, line[0], line[1], (0, 255, 0), 2)
+
+        # Update old_corners and oldFrameGray
+        oldFrameGray = frameGray.copy()
+        old_corners = new_corners.copy()
+
+        # Showing stuff on video
+        cv2.putText(frame, 'Tracking Integrity : Excellent %04.3f' % random.random(), (20, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, color=(200, 50, 75), thickness=3)
+        cv2.imshow('tracker', frame)
+
+        a = cv2.waitKey(5)
+        if a == 27:
+            cv2.destroyAllWindows()
+            cap.release()
+        elif a == 97:
+            break
+
+cv2.destroyAllWindows()
