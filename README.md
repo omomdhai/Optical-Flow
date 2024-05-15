@@ -12,7 +12,9 @@ Ensure you have the following installed:
 
 You can install the required libraries using pip:
 
+```
 pip install opencv-python numpy
+```
 
 ## Files and Scripts
 
@@ -21,12 +23,11 @@ pip install opencv-python numpy
 This script uses Farneback's method to compute dense optical flow. It visualizes the flow using both line representation and HSV color encoding.
 
 - **File**: `dense_optical_flow.py`
-  
 - **Description**: Computes and visualizes dense optical flow.
-  
 - **Usage**: 
+  ```
   python dense_optical_flow.py
-  
+  ```
 - **Features**:
   - Computes optical flow between frames.
   - Visualizes flow using line representation and HSV encoding.
@@ -37,12 +38,11 @@ This script uses Farneback's method to compute dense optical flow. It visualizes
 This script uses the Lucas-Kanade method for tracking a sparse set of features. It tracks the features over frames and displays the motion trajectories.
 
 - **File**: `sparse_optical_flow.py`
-  
 - **Description**: Tracks sparse features using Lucas-Kanade method and displays trajectories.
-  
 - **Usage**: 
+  ```
   python sparse_optical_flow.py
-  
+  ```
 - **Features**:
   - Detects good features to track.
   - Tracks features across frames.
@@ -53,12 +53,11 @@ This script uses the Lucas-Kanade method for tracking a sparse set of features. 
 This script demonstrates object tracking by selecting a Region of Interest (ROI) and dynamically updating the ROI based on the tracked object's movement.
 
 - **File**: `roi_tracking.py`
-  
 - **Description**: Tracks objects by dynamically updating the Region of Interest (ROI).
-  
 - **Usage**: 
+  ```
   python roi_tracking.py
-  
+  ```
 - **Features**:
   - Allows user to select an initial ROI.
   - Tracks objects and updates ROI based on movement.
@@ -67,18 +66,24 @@ This script demonstrates object tracking by selecting a Region of Interest (ROI)
 ## How to Run
 
 1. **Clone the Repository**:
+   ```
    git clone https://github.com/omomdhai/Optical-Flow.git
    cd Optical-Flow
+   ```
 
 2. **Run the Desired Script**:
    - For dense optical flow:
+     ```
      python dense_optical_flow.py
-     
+     ```
    - For sparse optical flow:
+     ```
      python sparse_optical_flow.py
-     
+     ```
    - For object tracking with ROI update:
+     ```
      python roi_tracking.py
+     ```
 
 ## Additional Information
 
