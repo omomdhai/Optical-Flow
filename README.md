@@ -67,8 +67,8 @@ This script demonstrates object tracking by selecting a Region of Interest (ROI)
 
 1. **Clone the Repository**:
    ```
-   git clone https://github.com/omomdhai/Optical-Flow.git
-   cd Optical-Flow
+   git clone https://github.com/omomdhai/Optical-Flow-Dense-And-Sparse-Based-Object-Tracking.git
+   cd Optical-Flow-Dense-And-Sparse-Based-Object-Tracking
    ```
 
 2. **Run the Desired Script**:
